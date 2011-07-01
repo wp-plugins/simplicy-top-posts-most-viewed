@@ -1,4 +1,4 @@
-=== Simplicy post view ===
+=== Simplicy top posts most viewed ===
 Contributors: fred91
 Donate link: 
 Author URI: http://www.naxialis.com
