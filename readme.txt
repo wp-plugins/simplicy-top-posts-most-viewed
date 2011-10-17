@@ -36,6 +36,6 @@ screenshot-1.jpg
 
 == Changelog ==
 
-= Version 1.1 (17/10/2011) = Correction des bug mineurs et ajout  css feuille de style
+= Version 1.1 (17/10/2011) = Fixed minor bugs and add css style sheet
 
 - one version

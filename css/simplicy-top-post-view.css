@@ -1,0 +1,10 @@
+/*Mise en forme Widget Simplicy top post */
+.SP-top-post { width:auto;}
+.SP-top-post a { color:#333333; }
+.SP-top-post a:hover { text-decoration:none; }
+.SP-top-post p { float:left;}
+.simplicy-top-post-img { border:solid 1px #CCCCCC ;float:left;padding:3px;margin-top:10px; margin-right:5px;}
+.simplicy-top-post{ margin-bottom:5px; margin-top:5px;} /* pour placer l'image au-dessus du titre placer : | clear:both; | dans cette ligne de code css */
+.simplicy-top-post-content{ border-bottom:solid 1px #CCCCCC; clear:both; margin-top:20px;}
+.simplicy-top-post-clear{ height:1px ; width:100%; clear:both;}
+.simplicy-top-date_post {font-size:10px; line-height:15px;width:auto; height:15px; text-align:left; padding-bottom:5px; float:left; clear:both;}
