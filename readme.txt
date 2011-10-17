@@ -5,7 +5,7 @@ Author URI: http://www.naxialis.com
 Plugin URI: http://plugins.svn.wordpress.org/simplicy-top-posts-most-viewed/
 Tags: most, view, viewed,top post, widget, counter,  popular posts, statistics
 Requires at least: 3.0
-Tested up to: 3.13
+Tested up to: 3.21
 Stable tag: 0.07
 
 Simplicy top posts most viewed is a Widget displays your most visited section in your sidebar.
@@ -36,6 +36,6 @@ screenshot-1.jpg
 
 == Changelog ==
 
-= Version 1.0 (30/06/2011) = = Version 1.0 (30/06/2011)
+= Version 1.1 (17/10/2011) = Correction des bug mineurs et ajout  css feuille de style
 
 - one version

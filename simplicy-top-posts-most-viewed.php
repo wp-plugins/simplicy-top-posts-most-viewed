@@ -7,6 +7,7 @@
  * Author: Naxialis
  * Author URI: http://www.naxialis.com
  */
+  wp_enqueue_style('simplicy-post-view', '/wp-content/plugins/simplicy-top-posts-most-viewed/css/simplicy-top-post-view.css');
 class Widget_simplicy_top_post_viewed extends WP_Widget  //class /!\
 {
 	function Widget_simplicy_top_post_viewed() 
@@ -63,7 +64,7 @@ class Widget_simplicy_top_post_viewed extends WP_Widget  //class /!\
 		add_filter('excerpt_length', $new_excerpt_length);
 		
 		// affichage du widget
-		
+		echo "<ul class='SP-top-post'>" ;
 		if ($item != null) 
 		{
 			if (is_numeric($category))
@@ -79,26 +80,30 @@ class Widget_simplicy_top_post_viewed extends WP_Widget  //class /!\
 			}
 			if (have_posts())
 			{
-				echo "<ul>" ;
+				
 				while (have_posts()) : the_post(); ?>
-					<li style=" border-bottom:#CCCCCC dashed 1px;"> 
-						<a href="<?php the_permalink() ?>" rel="bookmark" title="<?php printf(the_title()); ?>"><?php the_title(); ?> </a> <p><?php echo '<em>' ; ?><?php echo getPostViews (get_the_ID ());?> <?php echo $vue ; ?><?php echo '</em>' ; ?></p>
-					
+					<div class="simplicy-top-post-clear"></div>
+                    
                     <!-- affichage de la miniature -->
                     <?php if ( $instance['view_thumbs'] ) : ?>
                     <a href="<?php the_permalink() ?>" >
 						<?php global $post;
   						$thumb=vp_get_thumbs_url_view($post->post_content); 
-  						if ($thumb!='') echo '<p style="float:left;"><img width="'.$thumb_w.'" height="'.$thumb_h.'" src="'.$thumb.'" alt="'. get_the_title().'" /></p>'; ?>
+  						if ($thumb!='') echo '<dt><img class="simplicy-top-post-img"  width="'.$thumb_w.'" height="'.$thumb_h.'" src="'.$thumb.'" alt="'. get_the_title().'" /></dt>'; ?>
   					</a>
-                    <?php endif; ?>
+                    <?php endif; ?>      
+                    <dt class="simplicy-top-post" ><a href="<?php the_permalink() ?>" rel="bookmark" title="<?php printf(the_title()); ?>"><?php the_title(); ?> </a><?php echo '<em>(' ; ?><?php echo getPostViews (get_the_ID ());?> <?php echo $vue ; ?><?php echo '</em>)' ; ?></dt>   	
                     <!-- affichage de la miniature fin -->
                     <?php if ( $instance['excerpt'] ) : ?>
                     <?php the_excerpt(); ?> 
-                    </li>
+                    
                     <?php endif; ?>
+                    <?php echo "<div class='simplicy-top-post-content'></div>"; ?>
 				<?php endwhile ;
+				
+				echo "</br> ";
 				echo "</ul>" ;
+				
 			}
 		}
 		
