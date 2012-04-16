@@ -1,21 +1,26 @@
 <?php
 /*
- * Plugin Name: Simplicy Top Posts Most Viewed
- * Version: 1.0
- * Plugin URI: http://www.naxialis.com
- * Description: Afficher vos article les plus consulter dans votre sidebar.
- * Author: Naxialis
- * Author URI: http://www.naxialis.com
+   Plugin Name: Simplicy Top Posts Most Viewed
+   Version: 1.2
+   Plugin URI: http://www.naxialis.com/plugin-top-articles
+   Description: Afficher vos article les plus consulter dans votre sidebar.
+   Author: Naxialis
+   Author URI: http://www.naxialis.com
+   License: GPLv2 or later
  */
-  wp_enqueue_style('simplicy-post-view', '/wp-content/plugins/simplicy-top-posts-most-viewed/css/simplicy-top-post-view.css');
+wp_register_style( 'simplicy-top-post-view', WP_PLUGIN_URL . '/simplicy-top-posts-most-viewed/css/simplicy-top-post-view.css' );
+wp_enqueue_style( 'simplicy-top-post-view' );
+
 class Widget_simplicy_top_post_viewed extends WP_Widget  //class /!\
 {
 	function Widget_simplicy_top_post_viewed() 
 	{		
 		$widget_ops = array('classname' => 'Widget_simplicy_top_post_viewed', 'description' => __( "Afficher et personnaliser l&acute;affichage de vos articles dans la sidebar") );		
-		$control_ops = array('width' => 350, 'height' => 300);		
+		$control_ops = array('width' => 400, 'height' => 300);		
 		$this->WP_Widget('Widget_simplicy_top_post_viewed', __('Simplicy Top Posts Most Viewed'), $widget_ops, $control_ops);
 	}
+
+
 
 	function widget($args, $instance){
 		extract($args);    
@@ -26,8 +31,10 @@ class Widget_simplicy_top_post_viewed extends WP_Widget  //class /!\
 		$thumb_w = empty($instance['thumb_w']) ? null : $instance['thumb_w']; 
 		$thumb_h = empty($instance['thumb_h']) ? null : $instance['thumb_h']; 
 		$lenght = empty($instance['lenght']) ? null : $instance['lenght']; 
+		$date_1 = empty($instance['date_1']) ? null : $instance['date_1'];
+		$date_2 = empty($instance['date_2']) ? null : $instance['date_2'];
 		
-		
+		 
 		// Find dropdown value categorie
     
        if(strpos($item, 'c:') !== FALSE) {
@@ -57,27 +64,34 @@ class Widget_simplicy_top_post_viewed extends WP_Widget  //class /!\
 		echo $before_widget;		
 		if ( $title )
 			echo $before_title . $title . $after_title;
-						
+			
+			
+// Filter
+require_once(dirname(__FILE__).'/functions/filters.php');
+// Filter end	
+
 		// Excerpt length filter
 	$new_excerpt_length = create_function('$length', "return " . $instance["excerpt_length"] . ";");
 	if ( $instance["excerpt_length"] > 0 )
 		add_filter('excerpt_length', $new_excerpt_length);
 		
+
 		// affichage du widget
 		echo "<ul class='SP-top-post'>" ;
 		if ($item != null) 
 		{
 			if (is_numeric($category))
 			{
-				query_posts(array(  'cat' => $category,  'orderby' => 'meta_value_num',  'order' => 'DESC',  'post_type' => 'post',  'post_status' => 'publish',  'posts_per_page' => $nb_posts,  'meta_key' => 'post_views_count', 'caller_get_posts'=> 1
+				query_posts(array(  'cat' => $category,  'orderby' => 'meta_value_num',  'order' => 'DESC', 'post_type' => 'post',  'post_status' => 'publish',  'posts_per_page' => $nb_posts,  'meta_key' => 'post_views_count', 'caller_get_posts'=> 1
 ));
 			}
 			
 			else
 			{
-				query_posts(array(  'category_name' => $category,  'orderby' => 'meta_value_num',  'order' => 'DESC',  'post_type' => 'post',  'post_status' => 'publish',  'posts_per_page' => $nb_posts,  'meta_key' => 'post_views_count', 'caller_get_posts'=> 1
+				query_posts(array(  'category_name' => $category,  'orderby' => 'meta_value_num',  'order' => 'DESC','monthnum' => $date_1,'year'=> $date_2,'w' => $week,  'post_type' => 'post',  'post_status' => 'publish',  'posts_per_page' => $nb_posts,  'meta_key' => 'post_views_count', 'caller_get_posts'=> 1
 ));
 			}
+			
 			if (have_posts())
 			{
 				
@@ -89,24 +103,38 @@ class Widget_simplicy_top_post_viewed extends WP_Widget  //class /!\
                     <a href="<?php the_permalink() ?>" >
 						<?php global $post;
   						$thumb=vp_get_thumbs_url_view($post->post_content); 
-  						if ($thumb!='') echo '<dt><img class="simplicy-top-post-img"  width="'.$thumb_w.'" height="'.$thumb_h.'" src="'.$thumb.'" alt="'. get_the_title().'" /></dt>'; ?>
+  						if ($thumb!='') echo '<img class="simplicy-top-post-img"  width="'.$thumb_w.'" height="'.$thumb_h.'" src="'.$thumb.'" alt="'. get_the_title().'" />'; ?>
   					</a>
                     <?php endif; ?>      
-                    <dt class="simplicy-top-post" ><a href="<?php the_permalink() ?>" rel="bookmark" title="<?php printf(the_title()); ?>"><?php the_title(); ?> </a><?php echo '<em>(' ; ?><?php echo getPostViews (get_the_ID ());?> <?php echo $vue ; ?><?php echo '</em>)' ; ?></dt>   	
+                    <dt class="simplicy-top-post" ><a href="<?php the_permalink() ?>" rel="bookmark" title="<?php printf(the_title()); ?>"><?php the_title(); ?> </a>
+                    <?php if ( $instance['post_click'] ) :
+					echo '<br /><em>(' ; ?><?php echo getPostViews (get_the_ID ());?> <?php echo $vue ; ?><?php echo '</em>)' ;
+					endif; 
+					?>
+                    </dt>   	
                     <!-- affichage de la miniature fin -->
                     <?php if ( $instance['excerpt'] ) : ?>
                     <?php the_excerpt(); ?> 
-                    
+                   
                     <?php endif; ?>
                     <?php echo "<div class='simplicy-top-post-content'></div>"; ?>
 				<?php endwhile ;
-				
+				wp_reset_query();
+				if ( $instance['7_days'] ) :
+				remove_filter('posts_where', 'filter_where_spmw');
+				endif;
+				if ( $instance['15_days'] ) :
+				remove_filter('posts_where', 'filter_where_spmw');
+				endif;
+				if ( $instance['30_days'] ) :
+				remove_filter('posts_where', 'filter_where_spmw');
+				endif;
 				echo "</br> ";
 				echo "</ul>" ;
 				
 			}
 		}
-		
+
 		echo $after_widget;
 	}
 	
@@ -117,6 +145,7 @@ class Widget_simplicy_top_post_viewed extends WP_Widget  //class /!\
 		//on enregistre la variable 'titre'
 		$instance = $old_instance; 		
 		$instance['title'] = strip_tags(stripslashes($new_instance['title']));
+		$instance['post_click'] = strip_tags(stripslashes($new_instance['post_click']));
 		$instance['vue'] = strip_tags(stripslashes($new_instance['vue']));
 		//on enregistre la variable 'category'
 		$instance['category'] = strip_tags(stripslashes($new_instance['category']));
@@ -128,6 +157,12 @@ class Widget_simplicy_top_post_viewed extends WP_Widget  //class /!\
 		$instance['view_thumbs'] = strip_tags(stripslashes($new_instance['view_thumbs']));
 		$instance['excerpt_length'] = strip_tags(stripslashes($new_instance['excerpt_length']));
 		$instance['item'] = strip_tags(stripslashes($new_instance['item']));
+		$instance['date_1'] = strip_tags(stripslashes($new_instance['date_1']));
+		$instance['date_2'] = strip_tags(stripslashes($new_instance['date_2']));
+		$instance['7_days'] = strip_tags(stripslashes($new_instance['7_days']));
+		$instance['15_days'] = strip_tags(stripslashes($new_instance['15_days']));
+		$instance['30_days'] = strip_tags(stripslashes($new_instance['30_days']));
+		$instance['week'] = strip_tags(stripslashes($new_instance['week']));
 		
 
 		return $instance;
@@ -152,15 +187,23 @@ class Widget_simplicy_top_post_viewed extends WP_Widget  //class /!\
 		$thumb_h = htmlspecialchars($instance['thumb_h']);
 		$item = htmlspecialchars($instance['item']);
 		$post = htmlspecialchars($instance['post_id']);
+		$date_1 = htmlspecialchars($instance['date_1']);
+		$date_2 = htmlspecialchars($instance['date_2']);
 	
 		
 		
 
-		echo '<p style="text-align:left;"><label for="' . $this->get_field_name('title') . '">' . __('<p>Titre:</p>') . ' <input style="width: 250px;float:left;" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" type="text" value="' . $title . '" /></label></p>'; ?>
-        
-<?php // valeur a affivher pour les vues ?>
+		echo '<p style="text-align:left;"><label for="' . $this->get_field_name('title') . '">' . __('<p>Titre:</p>') . ' <input style="width: 350px;float:left;" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" type="text" value="' . $title . '" /></label></p>'; ?>
+ <br /> <br />  <br />        
+ <!-- affichage clique -->
+<label for="<?php echo $this->get_field_id("post_click"); ?>">
+				<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id("post_click"); ?>" name="<?php echo $this->get_field_name("post_click"); ?>"<?php checked( (bool) $instance["post_click"], true ); ?> />
+				<?php _e( 'Afficher le nombre de clique par article' ); ?>
+			</label>
+
+<?php // valeur a afficher pour les vues ?>
 <?php
-echo '<p style="text-align:left;"><label for="' . $this->get_field_name('vue') . '">' . __('<br /><p style="margin-bottom:10px;padding-bottom:0; padding-top:5px;">Nom de la valeur :</p><p style="font-size:9px;"><em>ex : vue(s) ,Visite(s), Lecture(s)</em></p>') . ' <input style="width: 250px;float:left;" id="' . $this->get_field_id('vue') . '" name="' . $this->get_field_name('vue') . '" type="text" value="' . $vue . '" /></label></p>'; ?>
+echo '<p style="text-align:left;"><label for="' . $this->get_field_name('vue') . '">' . __('<br /><p style="margin-bottom:10px;padding-bottom:0; padding-top:5px;">Nom de la valeur :</p><p style="font-size:9px;"><em>ex : vue(s) ,Visite(s), Lecture(s)</em></p>') . ' <input style="width: 350px;float:left;" id="' . $this->get_field_id('vue') . '" name="' . $this->get_field_name('vue') . '" type="text" value="' . $vue . '" /></label></p>'; ?>
         
 		<?php //La catégorie ?>
 <br /><br />           
@@ -170,18 +213,79 @@ echo '<p style="text-align:left;"><label for="' . $this->get_field_name('vue') .
     <select name="<?php echo $this->get_field_name('item'); ?>" id="<?php echo $this->get_field_id('item'); ?>">
           <option value="">  </option>
         <?php foreach(spp_get_dropdown_view() as $category) : ?>
-          <option style="width: 225px;" <?php echo ('c:' . $category['category_id'] == $instance['item']) ? 'selected' : '' ?> value="c:<?php echo $category['category_id']; ?>">
+          <option style="width: 325px;" <?php echo ('c:' . $category['category_id'] == $instance['item']) ? 'selected' : '' ?> value="c:<?php echo $category['category_id']; ?>">
           Catégorie: <?php echo $category['category_name']; ?> 
     
           </option>
       	<?php endforeach; ?>
     </select>
   </p>
-  <?php
-		//Le nombre de posts à montrer
-		echo '<p style="text-align:left;"><label for="' . $this->get_field_name('posts_nb') . '">' . __('<p>Nombre d&acute;article à afficher:</p>') . ' <input style="width: 100px;float:left;" id="' . $this->get_field_id('posts') . '" name="' . $this->get_field_name('posts_nb') . '" type="text" value="' . $posts_nb . '" /></label></p><br /><br />'; ?>
+  <?php //Le nombre de posts à montrer ?>
+		
+<p>
+			<label for="<?php echo $this->get_field_id("posts_nb"); ?>">
+				<?php _e( 'Nombre d&acute;article à afficher:' ); ?>
+			</label>
+			<input style="text-align: center;" type="text" id="<?php echo $this->get_field_id("posts_nb"); ?>" name="<?php echo $this->get_field_name("posts_nb"); ?>" value="<?php echo $instance["posts_nb"]; ?>" size="3" />
+		</p> <br />
+       
+<FIELDSET class="sptmw">
+<LEGEND align=top> <strong>Options d'affichage par mois et année</strong> </LEGEND> 
+<?php // date 1 indique la valeur numérique de l'année
+				
+				echo '<p style="text-align:left;"><input style="width:10%; margin-top:8px;margin-right:3px;float:left;" id="' . $this->get_field_id('date_2') . '" name="' . $this->get_field_name('date_2') . '" type="text" value="' . $date_2 . '" /><label for="' . $this->get_field_name('date_2') . '">' . __('<p>Indiquez l&acute;année de publication <em>( exemple : 2012 )</em></p>') . ' </label></p>'; ?>
+				
+				
+<?php // date 1 indique la valeur numérique du mois
+				
+				echo '<p style="text-align:left;"><input style="width:10%; margin-top:8px;margin-right:3px;float:left;" id="' . $this->get_field_id('date_1') . '" name="' . $this->get_field_name('date_1') . '" type="text" value="' . $date_1 . '" /><label for="' . $this->get_field_name('date_1') . '">' . __('<p style=" padding-top:12px;">Indiquez le mois de publication <em>( exemple : Mars = 3 )</em></p>') . '</label></p>'; ?>
+		<p>
+        <?php _e( '<em>Laisser 0 pour ne pas utiliser ses options</em>' ); ?>
+        </p>		
+</FIELDSET>                
+
+    
+
+<FIELDSET class="sptmw">
+<LEGEND align=top> <strong>Options d'affichage avancé</strong> </LEGEND> 
+<?php // afficher les articles publié dans la semaine ?> 
+    <p> 
+<label for="<?php echo $this->get_field_id("week"); ?>">
+				<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id("week"); ?>" name="<?php echo $this->get_field_name("week"); ?>"<?php checked( (bool) $instance["week"], true ); ?> />
+				<?php _e( 'Afficher les articles publié cette semaine' ); ?>
+			</label>
+		</p>
+                
+<?php // afficher des articles publié il y a xx jours ?> 
+    <p> <!-- last 7 days -->  
+<label for="<?php echo $this->get_field_id("7_days"); ?>">
+				<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id("7_days"); ?>" name="<?php echo $this->get_field_name("7_days"); ?>"<?php checked( (bool) $instance["7_days"], true ); ?> />
+				<?php _e( 'Afficher les articles publié depuis 7 jours' ); ?>
+			</label>
+		</p>
+ <p>   <!-- last 15 days -->
+<label for="<?php echo $this->get_field_id("15_days"); ?>">
+				<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id("15_days"); ?>" name="<?php echo $this->get_field_name("15_days"); ?>"<?php checked( (bool) $instance["15_days"], true ); ?> />
+				<?php _e( 'Afficher les articles publié depuis 15 jours' ); ?>
+			</label>
+		</p>
+<p>   <!-- last 30 days -->
+<label for="<?php echo $this->get_field_id("30_days"); ?>">
+				<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id("30_days"); ?>" name="<?php echo $this->get_field_name("30_days"); ?>"<?php checked( (bool) $instance["30_days"], true ); ?> />
+				<?php _e( 'Afficher les articles publié depuis 30 jours' ); ?>
+			</label>
+		</p>
+        <p>
+        <?php _e( '<em>Ne cocher qu&acute;une seule option</em>' ); ?>
+        </p>
+        </FIELDSET>
+
 	
-	<?php // afficher extrait ?>    
+	<?php // afficher extrait ?> 
+    <FIELDSET class="sptmw">
+<LEGEND align=top> <strong><?php _e('Extrait des articles'); ?></strong> </LEGEND>
+
+    <p>   
 <label for="<?php echo $this->get_field_id("excerpt"); ?>">
 				<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id("excerpt"); ?>" name="<?php echo $this->get_field_name("excerpt"); ?>"<?php checked( (bool) $instance["excerpt"], true ); ?> />
 				<?php _e( 'Afficher un extrait' ); ?>
@@ -194,8 +298,11 @@ echo '<p style="text-align:left;"><label for="' . $this->get_field_name('vue') .
 			</label>
 			<input style="text-align: center;" type="text" id="<?php echo $this->get_field_id("excerpt_length"); ?>" name="<?php echo $this->get_field_name("excerpt_length"); ?>" value="<?php echo $instance["excerpt_length"]; ?>" size="3" />
 		</p>
-        
-<?php // afficher une vignette ?>    
+</FIELDSET>        
+<?php // afficher une vignette ?>
+<FIELDSET class="sptmw">
+<LEGEND align=top> <strong><?php _e(' Image des articles '); ?></strong> </LEGEND> 
+    
 <label for="<?php echo $this->get_field_id("view_thumbs"); ?>">
 				<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id("view_thumbs"); ?>" name="<?php echo $this->get_field_name("view_thumbs"); ?>"<?php checked( (bool) $instance["view_thumbs"], true ); ?> />
 				<?php _e( 'Afficher une vignette' ); ?>
@@ -204,7 +311,7 @@ echo '<p style="text-align:left;"><label for="' . $this->get_field_name('vue') .
 		<?php //dimention de la vignette ?>
 		<p>
 			<label>
-				<?php _e('<p>Dimenssion de la vignette: </p>'); ?>
+				
 				<?php echo '<p style="text-align:left;"><label for="' . $this->get_field_name('thumb_w') . '">' . __('<p style="float:left;line-height:22px;">Largeur :</p>') . '<input style="width:20%;float:left;" id="' . $this->get_field_id('thumb_w') . '" name="' . $this->get_field_name('thumb_w') . '" type="text" value="' . $thumb_w . '" /></label></p>'; ?>
 				</label>
            		<label>				
@@ -212,6 +319,11 @@ echo '<p style="text-align:left;"><label for="' . $this->get_field_name('vue') .
 				</label>
 			
 		</p>
+<br /><br /><br />
+         <p>
+        <?php _e( '<em>Unité uliser le PX</em>' ); ?>
+        </p>
+       </FIELDSET>
         <br /> <br />
 
 <?php

@@ -1,10 +1,10 @@
 === Simplicy top posts most viewed ===
 Contributors: fred91
-Donate link: 
+Donate link: http://www.naxialis.com
 Author URI: http://www.naxialis.com
 Plugin URI: http://plugins.svn.wordpress.org/simplicy-top-posts-most-viewed/
 Tags: most, view, viewed,top post, widget, counter,  popular posts, statistics
-Requires at least: 3.0
+Requires at least: 3.3
 Tested up to: 3.21
 Stable tag: 0.07
 
@@ -16,11 +16,16 @@ Simplicy top posts most viewed is a Widget displays your most visited section in
  
 <p>-Select an item or category<br />
 -The item number is displayed (if a category is selected)<br />
--Display of the extract or not<br />
--Character limit in the extract (if the option Show the extract is checked)<br />
+-Display of the excerpt or not<br />
+-Character limit in the excerpt (if the option Show the extract is checked)<br />
 -Display of miniature or not<br />
--Dimensions of the miniature in order to fit your theme (if the option Show thumbnails is checked)<br /><br />
--value name ex: visit (s), reading (s) ... you can type the custom name.</p>
+-size of the thumbnails in order to fit your theme (if the option Show thumbnails is checked)<br /><br />
+-value name ex: visit (s), reading (s) ... you can type the custom name.<br />
+
+-choice of posts published per month and year.<br />
+-choice of post published in the last 7,15,30 days.<br />
+
+</p>
 
 
 == Installation ==
@@ -36,6 +41,7 @@ screenshot-1.jpg
 
 == Changelog ==
 
-= Version 1.1 (17/10/2011) = Fixed minor bugs and add css style sheet
+= Version 1.1 (17/10/2011) = Fixed minor bugs and add css style sheet <br />
+= Version 1.2 (16/04/2012) = adding new options <br />
 
 - one version

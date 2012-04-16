@@ -8,3 +8,14 @@
 .simplicy-top-post-content{ border-bottom:solid 1px #CCCCCC; clear:both; margin-top:20px;}
 .simplicy-top-post-clear{ height:1px ; width:100%; clear:both;}
 .simplicy-top-date_post {font-size:10px; line-height:15px;width:auto; height:15px; text-align:left; padding-bottom:5px; float:left; clear:both;}
+
+/* Mise en forme du widget interne ! important */
+.sptmw{ 
+border: solid 1px #CCCCCC;
+background-color:#efefef; 
+padding:10px; 
+margin-bottom:10px;
+-webkit-border-radius: 5px;
+-moz-border-radius: 5px;
+border-radius: 5px;
+}
