@@ -1,7 +1,7 @@
 <?php
 /*
    Plugin Name: Simplicy Top Posts Most Viewed
-   Version: 1.2
+   Version: 1.3
    Plugin URI: http://www.naxialis.com/plugin-top-articles
    Description: Afficher vos article les plus consulter dans votre sidebar.
    Author: Naxialis

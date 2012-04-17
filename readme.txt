@@ -43,5 +43,6 @@ screenshot-1.jpg
 
 = Version 1.1 (17/10/2011) = Fixed minor bugs and add css style sheet <br />
 = Version 1.2 (16/04/2012) = adding new options <br />
+= Version 1.3 (16/04/2012) = fixed bug filters <br />
 
 - one version
