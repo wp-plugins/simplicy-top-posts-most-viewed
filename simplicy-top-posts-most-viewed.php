@@ -1,7 +1,7 @@
 <?php
 /*
    Plugin Name: Simplicy Top Posts Most Viewed
-   Version: 1.3
+   Version: 1.4
    Plugin URI: http://www.naxialis.com/plugin-top-articles
    Description: Afficher vos article les plus consulter dans votre sidebar.
    Author: Naxialis
@@ -101,12 +101,19 @@ require_once(dirname(__FILE__).'/functions/filters.php');
                     <!-- affichage de la miniature -->
                     <?php if ( $instance['view_thumbs'] ) : ?>
                     <a href="<?php the_permalink() ?>" >
-						<?php global $post;
-  						$thumb=vp_get_thumbs_url_view($post->post_content); 
-  						if ($thumb!='') echo '<img class="simplicy-top-post-img"  width="'.$thumb_w.'" height="'.$thumb_h.'" src="'.$thumb.'" alt="'. get_the_title().'" />'; ?>
-  					</a>
+                     <?php
+					if (has_post_thumbnail()) { ?>
+                    <a href="<?php the_permalink() ?>" title="<?php the_title(); ?>">
+					<?php $thumb = get_post_thumbnail_id(); $img_url = wp_get_attachment_url( $thumb,'full' ); $image = sp_post_top_view_resize( $img_url, $thumb_w, $thumb_h, true ); ?>
+         			<img class="simplicy-top-post-img" src="<?php echo $image ?>" border="0"/>
+				   </a>
+                   <?php } else { } // Si il n'y a pas d'image on affiche rien ?>
                     <?php endif; ?>      
                     <dt class="simplicy-top-post" ><a href="<?php the_permalink() ?>" rel="bookmark" title="<?php printf(the_title()); ?>"><?php the_title(); ?> </a>
+                    <!-- affichage de la date -->
+                   <?php if ( $instance['date'] ) : ?>
+                   <dt class="simplicy-top-date_post"> Le <?php the_time('j F, Y') ?>| <strong><?php comments_number('0','1 ','%' );?></strong> </dt>
+				   <?php endif; ?>
                     <?php if ( $instance['post_click'] ) :
 					echo '<br /><em>(' ; ?><?php echo getPostViews (get_the_ID ());?> <?php echo $vue ; ?><?php echo '</em>)' ;
 					endif; 
@@ -157,6 +164,7 @@ require_once(dirname(__FILE__).'/functions/filters.php');
 		$instance['view_thumbs'] = strip_tags(stripslashes($new_instance['view_thumbs']));
 		$instance['excerpt_length'] = strip_tags(stripslashes($new_instance['excerpt_length']));
 		$instance['item'] = strip_tags(stripslashes($new_instance['item']));
+		$instance['date'] = strip_tags(stripslashes($new_instance['date']));
 		$instance['date_1'] = strip_tags(stripslashes($new_instance['date_1']));
 		$instance['date_2'] = strip_tags(stripslashes($new_instance['date_2']));
 		$instance['7_days'] = strip_tags(stripslashes($new_instance['7_days']));
@@ -193,8 +201,7 @@ require_once(dirname(__FILE__).'/functions/filters.php');
 		
 		
 
-		echo '<p style="text-align:left;"><label for="' . $this->get_field_name('title') . '">' . __('<p>Titre:</p>') . ' <input style="width: 350px;float:left;" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" type="text" value="' . $title . '" /></label></p>'; ?>
- <br /> <br />  <br />        
+echo '<p style="text-align:left;"><label for="' . $this->get_field_name('title') . '">' . __('Titre:') . ' <input style="width:100%;" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" type="text" value="' . $title . '" /></label></p>'; ?>      
  <!-- affichage clique -->
 <label for="<?php echo $this->get_field_id("post_click"); ?>">
 				<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id("post_click"); ?>" name="<?php echo $this->get_field_name("post_click"); ?>"<?php checked( (bool) $instance["post_click"], true ); ?> />
@@ -220,6 +227,15 @@ echo '<p style="text-align:left;"><label for="' . $this->get_field_name('vue') .
       	<?php endforeach; ?>
     </select>
   </p>
+  
+  <p>	
+	<?php // afficher la date et le nombre de commentaire ?>    
+			<label for="<?php echo $this->get_field_id("date"); ?>">
+				<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id("date"); ?>" name="<?php echo $this->get_field_name("date"); ?>"<?php checked( (bool) $instance["date"], true ); ?> />
+				<?php _e( 'Afficher la date et le nombre de commentaire' ); ?>
+			</label>
+</p>
+  
   <?php //Le nombre de posts à montrer ?>
 		
 <p>
@@ -321,7 +337,7 @@ echo '<p style="text-align:left;"><label for="' . $this->get_field_name('vue') .
 		</p>
 <br /><br /><br />
          <p>
-        <?php _e( '<em>Unité uliser le PX</em>' ); ?>
+        <?php _e( '<em>Unité utiliser le PX</em>' ); ?>
         </p>
        </FIELDSET>
         <br /> <br />
@@ -358,50 +374,93 @@ function setSimplicyViews($postID) {
     }
 }
 // ******************************************************** fonction image ***************************************************************
- 
-
-function vp_get_thumbs_url_view($text)
-{
-  global $post;
- 
-  $imageurl="";        
- 
-  // extract the thumbnail from attached imaged
-  $allimages =&get_children('post_type=attachment&post_mime_type=image&post_parent=' . $post->ID );        
- 
-  foreach ($allimages as $img){                
-     $img_src = wp_get_attachment_image_src($img->ID);
-     break;                       
-  }
- 
-  $imageurl=$img_src[0];
- 
- 
-  // try to get any image
-  if (!$imageurl)
-  {
-    preg_match('/<\s*img [^\>]*src\s*=\s*[\""\']?([^\""\'>]*)/i' ,  $text, $matches);
-    $imageurl=$matches[1];
-  }
- 
-  // try to get youtube video thumbnail
-  if (!$imageurl)
-  {
-    preg_match("/([a-zA-Z0-9\-\_]+\.|)youtube\.com\/watch(\?v\=|\/v\/)([a-zA-Z0-9\-\_]{11})([^<\s]*)/", $text, $matches2);
- 
-    $youtubeurl = $matches2[0];
-    if ($youtubeurl)
-     $imageurl = "http://i.ytimg.com/vi/{$matches2[3]}/1.jpg"; 
-   else preg_match("/([a-zA-Z0-9\-\_]+\.|)youtube\.com\/(v\/)([a-zA-Z0-9\-\_]{11})([^<\s]*)/", $text, $matches2);
- 
-   $youtubeurl = $matches2[0];
-   if ($youtubeurl)
-     $imageurl = "http://i.ytimg.com/vi/{$matches2[3]}/1.jpg"; 
-  }
- 
- 
-return $imageurl;
+function sp_post_top_view_resize( $url, $width, $height = null, $crop = null, $single = true ) {
+	
+	//validate inputs
+	if(!$url OR !$width ) return false;
+	
+	//define upload path & dir
+	$upload_info = wp_upload_dir();
+	$upload_dir = $upload_info['basedir'];
+	$upload_url = $upload_info['baseurl'];
+	
+	//check if $img_url is local
+	if(strpos( $url, $upload_url ) === false) return false;
+	
+	//define path of image
+	$rel_path = str_replace( $upload_url, '', $url);
+	$img_path = $upload_dir . $rel_path;
+	
+	//check if img path exists, and is an image indeed
+	if( !file_exists($img_path) OR !getimagesize($img_path) ) return false;
+	
+	//get image info
+	$info = pathinfo($img_path);
+	$ext = $info['extension'];
+	list($orig_w,$orig_h) = getimagesize($img_path);
+	
+	//get image size after cropping
+	$dims = image_resize_dimensions($orig_w, $orig_h, $width, $height, $crop);
+	$dst_w = $dims[4];
+	$dst_h = $dims[5];
+	
+	//use this to check if cropped image already exists, so we can return that instead
+	$suffix = "{$dst_w}x{$dst_h}";
+	$dst_rel_path = str_replace( '.'.$ext, '', $rel_path);
+	$destfilename = "{$upload_dir}{$dst_rel_path}-{$suffix}.{$ext}";
+	
+	//if orig size is smaller
+	if($width >= $orig_w) {
+		
+		if(!$dst_h) :
+			//can't resize, so return original url
+			$img_url = $url;
+			$dst_w = $orig_w;
+			$dst_h = $orig_h;
+			
+		else :
+			//else check if cache exists
+			if(file_exists($destfilename) && getimagesize($destfilename)) {
+				$img_url = "{$upload_url}{$dst_rel_path}-{$suffix}.{$ext}";
+			} 
+			//else resize and return the new resized image url
+			else {
+				$resized_img_path = image_resize( $img_path, $width, $height, $crop );
+				$resized_rel_path = str_replace( $upload_dir, '', $resized_img_path);
+				$img_url = $upload_url . $resized_rel_path;
+			}
+			
+		endif;
+		
+	}
+	//else check if cache exists
+	elseif(file_exists($destfilename) && getimagesize($destfilename)) {
+		$img_url = "{$upload_url}{$dst_rel_path}-{$suffix}.{$ext}";
+	} 
+	//else, we resize the image and return the new resized image url
+	else {
+		$resized_img_path = image_resize( $img_path, $width, $height, $crop );
+		$resized_rel_path = str_replace( $upload_dir, '', $resized_img_path);
+		$img_url = $upload_url . $resized_rel_path;
+	}
+	
+	//return the output
+	if($single) {
+		//str return
+		$image = $img_url;
+	} else {
+		//array return
+		$image = array (
+			0 => $img_url,
+			1 => $dst_w,
+			2 => $dst_h
+		);
+	}
+	
+	return $image;
 }
+
+// Fin fonction image
 // modification affichage excert (...)
 function new_excerpt_more_view($excerpt) {
 	return str_replace('[...]', '', $excerpt);

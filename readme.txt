@@ -4,7 +4,7 @@ Donate link: http://www.naxialis.com
 Author URI: http://www.naxialis.com
 Plugin URI: http://plugins.svn.wordpress.org/simplicy-top-posts-most-viewed/
 Tags: most, view, viewed,top post, widget, counter,  popular posts, statistics
-Requires at least: 3.3
+Requires at least: 3.4
 Tested up to: 3.21
 Stable tag: 0.07
 
@@ -44,5 +44,6 @@ screenshot-1.jpg
 = Version 1.1 (17/10/2011) = Fixed minor bugs and add css style sheet <br />
 = Version 1.2 (16/04/2012) = adding new options <br />
 = Version 1.3 (16/04/2012) = fixed bug filters <br />
+= Version 1.4 (23/10/2012) = function improvement thumbnail <br />
 
 - one version
